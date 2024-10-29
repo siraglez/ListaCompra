@@ -7,18 +7,26 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
-class ProductAdapter(context: Context, private val products: List<Product>) :
+class ProductAdapter(context: Context, products: List<Product>) :
     ArrayAdapter<Product>(context, 0, products) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val product = getItem(position)!!
+        val view = convertView ?: LayoutInflater.from(context).inflate(
+            android.R.layout.simple_list_item_1, parent, false
+        )
 
-        // Verifica si se reutiliza una vista existente, de lo contrario, infla una nueva
-        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_product, parent, false)
+        // Obtenemos el producto en la posición actual
+        val product = getItem(position)
 
-        // Configura el texto del TextView
-        val textViewProduct: TextView = view.findViewById(R.id.textViewProduct)
-        textViewProduct.text = "\"${product.name}\": \"${product.quantity}\" = \"${product.price}\""
+        // Formateamos el texto para mostrar como "Producto (Cantidad) = Precio€"
+        val displayText = buildString {
+            append(product?.name ?: "")
+            if (!product?.quantity.isNullOrEmpty()) append(" (${product?.quantity})")
+            if (!product?.price.isNullOrEmpty()) append(" = ${product?.price}€")
+        }
+
+        // Configuramos el TextView para mostrar el texto
+        view.findViewById<TextView>(android.R.id.text1).text = displayText
 
         return view
     }

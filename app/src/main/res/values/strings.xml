@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ListaCompra</string>
+    <string name="app_name">Lista de Compra</string>
+    <string name="total_items">Número de productos: %d</string>
+    <string name="total_price">Precio total: %.2f€</string>
 </resources>

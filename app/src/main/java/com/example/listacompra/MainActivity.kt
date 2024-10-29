@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
         buttonAdd.setOnClickListener {
             addProduct()
         }
+
+        // Inicializar valores de totales al abrir la app
+        updateTotals()
     }
 
     private fun addProduct() {
@@ -60,9 +63,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateTotals() {
         val totalItems = products.size
-        val totalPrice = products.sumOf { it.price.toDoubleOrNull() ?: 0.0 }
+        val totalPrice = products.sumOf {
+            try {
+                it.price?.toDouble() ?: 0.0
+            } catch (e: NumberFormatException) {
+                0.0
+            }
+        }
 
-        textViewTotalItems.text = "Número de productos: $totalItems"
-        textViewTotalPrice.text = "Precio total: %.2f".format(totalPrice)
+        textViewTotalItems.text = getString(R.string.total_items, totalItems)
+        textViewTotalPrice.text = getString(R.string.total_price, totalPrice)
     }
 }
