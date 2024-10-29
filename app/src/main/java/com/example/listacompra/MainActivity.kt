@@ -1,47 +1,68 @@
 package com.example.listacompra
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.listacompra.ui.theme.ListaCompraTheme
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var listViewProducts: ListView
+    private lateinit var editTextProductName: EditText
+    private lateinit var editTextQuantity: EditText
+    private lateinit var editTextPrice: EditText
+    private lateinit var buttonAdd: Button
+    private lateinit var textViewTotalItems: TextView
+    private lateinit var textViewTotalPrice: TextView
+
+    private val products = mutableListOf<Product>()
+    private lateinit var productAdapter: ProductAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ListaCompraTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContentView(R.layout.activity_main)
+
+        listViewProducts = findViewById(R.id.listViewProducts)
+        editTextProductName = findViewById(R.id.editTextProductName)
+        editTextQuantity = findViewById(R.id.editTextQuantity)
+        editTextPrice = findViewById(R.id.editTextPrice)
+        buttonAdd = findViewById(R.id.buttonAdd)
+        textViewTotalItems = findViewById(R.id.textViewTotalItems)
+        textViewTotalPrice = findViewById(R.id.textViewTotalPrice)
+
+        productAdapter = ProductAdapter(this, products)
+        listViewProducts.adapter = productAdapter
+
+        buttonAdd.setOnClickListener {
+            addProduct()
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun addProduct() {
+        val productName = editTextProductName.text.toString().trim()
+        val quantity = editTextQuantity.text.toString().trim()
+        val price = editTextPrice.text.toString().trim()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ListaCompraTheme {
-        Greeting("Android")
+        if (productName.isNotEmpty()) {
+            val product = Product(name = productName, quantity = quantity, price = price)
+            products.add(product)
+            productAdapter.notifyDataSetChanged()
+            updateTotals()
+
+            // Limpiar los campos después de agregar
+            editTextProductName.text.clear()
+            editTextQuantity.text.clear()
+            editTextPrice.text.clear()
+        }
+    }
+
+    private fun updateTotals() {
+        val totalItems = products.size
+        val totalPrice = products.sumOf { it.price.toDoubleOrNull() ?: 0.0 }
+
+        textViewTotalItems.text = "Número de productos: $totalItems"
+        textViewTotalPrice.text = "Precio total: %.2f".format(totalPrice)
     }
 }
